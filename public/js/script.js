@@ -13,13 +13,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const cancelBtn = document.getElementById('cancelBtn');
 
     toggleFormBtn.addEventListener('click', () => {
-        mainContent.classList.add('d-none');
-        blogFormContainer.classList.remove('d-none');
+        mainContent.classList.add('hidden');
+        blogFormContainer.classList.remove('hidden');
     });
 
     cancelBtn.addEventListener('click', () => {
-        blogFormContainer.classList.add('d-none');
-        mainContent.classList.remove('d-none');
+        blogFormContainer.classList.add('hidden');
+        mainContent.classList.remove('hidden');
         document.getElementById('blogForm').reset();
     });
 
@@ -37,8 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const loadingSpinner = document.getElementById('loadingSpinner');
 
         submitBtn.disabled = true;
-        submitText.classList.add('d-none');
-        loadingSpinner.classList.remove('d-none');
+        submitText.classList.add('hidden');
+        loadingSpinner.classList.remove('hidden');
 
         try {
             const response = await fetch('/submit-blog', {
@@ -51,8 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 alert(result.message);
                 document.getElementById('blogForm').reset();
-                blogFormContainer.classList.add('d-none');
-                mainContent.classList.remove('d-none');
+                blogFormContainer.classList.add('hidden');
+                mainContent.classList.remove('hidden');
                 loadBlogs();
             } else {
                 alert(result.error || 'Error posting blog');
@@ -62,8 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error(error);
         } finally {
             submitBtn.disabled = false;
-            submitText.classList.remove('d-none');
-            loadingSpinner.classList.add('d-none');
+            submitText.classList.remove('hidden');
+            loadingSpinner.classList.add('hidden');
         }
     });
 
@@ -81,8 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const editLoadingSpinner = document.getElementById('editLoadingSpinner');
 
         editSubmitBtn.disabled = true;
-        editSubmitText.classList.add('d-none');
-        editLoadingSpinner.classList.remove('d-none');
+        editSubmitText.classList.add('hidden');
+        editLoadingSpinner.classList.remove('hidden');
 
         try {
             const response = await fetch(`/blogs/${blogId}`, {
@@ -104,8 +104,8 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error(error);
         } finally {
             editSubmitBtn.disabled = false;
-            editSubmitText.classList.remove('d-none');
-            editLoadingSpinner.classList.add('d-none');
+            editSubmitText.classList.remove('hidden');
+            editLoadingSpinner.classList.add('hidden');
         }
     });
 
@@ -124,27 +124,32 @@ async function loadBlogs() {
         
         blogs.forEach(blog => {
             const div = document.createElement('div');
-            div.className = 'col-md-6 col-lg-4';
+            div.className = 'bg-white rounded-2xl shadow-lg p-6 transform hover:scale-105 transition-all duration-300 cursor-pointer blog-card';
+            div.setAttribute('data-bs-toggle', 'modal');
+            div.setAttribute('data-bs-target', '#blogModal');
+            div.setAttribute('data-title', blog.title);
+            div.setAttribute('data-author', blog.author);
+            div.setAttribute('data-date', new Date(blog.created_at).toLocaleString());
+            div.setDrivenByData('data-content', blog.content.replace(/"/g, '&quot;'));
+            div.setAttribute('data-category', blog.category);
             div.innerHTML = `
-                <div class="blog-card shadow-sm" data-bs-toggle="modal" data-bs-target="#blogModal" 
-                     data-title="${blog.title}" data-author="${blog.author}" 
-                     data-date="${new Date(blog.created_at).toLocaleString()}" 
-                     data-content="${blog.content.replace(/"/g, '&quot;')}" data-category="${blog.category}">
-                    <img src="https://api.dicebear.com/9.x/initials/svg?seed=${blog.author}" alt="Avatar" class="avatar">
-                    <h5>${blog.title}</h5>
-                    <p class="text-muted small">By ${blog.author} | ${blog.category} | ${new Date(blog.created_at).toLocaleString()}</p>
-                    <p>${blog.content.substring(0, 100)}${blog.content.length > 100 ? '...' : ''}</p>
-                    ${blog.user_id === userId ? `
-                        <div class="mt-2">
-                            <button class="btn btn-icon btn-outline-primary edit-btn me-2" data-id="${blog.id}" data-title="${blog.title}" data-category="${blog.category}" data-content="${blog.content.replace(/"/g, '&quot;')}">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button class="btn btn-icon btn-outline-danger delete-btn" data-id="${blog.id}">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                    ` : ''}
+                <div class="flex items-center mb-3">
+                    <img src="https://api.dicebear.com/9.x/initials/svg?seed=${blog.author}" alt="Avatar" class="w-10 h-10 rounded-full mr-3">
+                    <h5 class="text-lg font-semibold text-gray-800">${blog.title}</h5>
                 </div>
+                <p class="text-gray-600 text-sm mb-3">By ${blog.author} | ${blog.category} | ${new Date(blog.created_at).toLocaleString()}</p>
+                <p class="text-gray-700">${blog.content.substring(0, 100)}${blog.content.length > 100 ? '...' : ''}</p>
+                ${blog.user_id === userId ? `
+                    <div class="mt-3 flex gap-2">
+                        <button class="px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all edit-btn" data-id="${blog.id}" data-title="${blog.title}" data-category="${blog.category}" data-content="${blog.content.replace(/"/g, '&quot;')}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all delete-btn" data-id="${blog.id}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                ` : ''}
+                <div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
             `;
             blogList.appendChild(div);
         });
