@@ -19,3 +19,6 @@ A simple and clean blogging platform focused on technology content. This project
 - Responsive UI using Bootstrap  
 - User-friendly interface  
 - Data storage with MySQL
+
+## 📷 Screenshots
+![image](https://github.com/user-attachments/assets/6e7c23c1-397f-4d98-9dd7-cbbbe371f76c)
